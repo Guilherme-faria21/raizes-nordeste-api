@@ -1,547 +1,759 @@
 {
-	"info": {
-		"_postman_id": "c8557c2f-7a6b-4221-9ee7-1d9fdf0fdc3b",
-		"name": "Raizes do Nordeste — API Back-End",
-		"description": "Colecao de testes para o projeto academico UNINTER — Trilha Back-End. Cobre fluxo principal, autenticacao, fidelidade, auditoria e cenarios de erro.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "55504697",
-		"_collection_link": "https://gui28032018-2596442.postman.co/workspace/gui28032018's-Workspace~70cf9bb9-049b-405a-874d-a24efb1b9a12/collection/55504697-c8557c2f-7a6b-4221-9ee7-1d9fdf0fdc3b?action=share&source=collection_link&creator=55504697"
-	},
-	"item": [
-		{
-			"name": "01 — [POSITIVO] Login ADMIN",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 200', () => pm.response.to.have.status(200));",
-							"const json = pm.response.json();",
-							"pm.test('Retorna access_token', () => pm.expect(json.access_token).to.be.a('string'));",
-							"pm.test('Perfil ADMIN', () => pm.expect(json.perfil).to.eql('ADMIN'));",
-							"pm.collectionVariables.set('token_admin', json.access_token);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
-					}
-				],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "username",
-							"value": "admin@raizes.com"
-						},
-						{
-							"key": "password",
-							"value": "Admin@123"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{base_url}}/auth/login",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"auth",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "02 — [POSITIVO] Login CLIENTE",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 200', () => pm.response.to.have.status(200));",
-							"const json = pm.response.json();",
-							"pm.test('Retorna access_token', () => pm.expect(json.access_token).to.be.a('string'));",
-							"pm.test('Perfil CLIENTE', () => pm.expect(json.perfil).to.eql('CLIENTE'));",
-							"pm.collectionVariables.set('token_cliente', json.access_token);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
-					}
-				],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "username",
-							"value": "maria@email.com"
-						},
-						{
-							"key": "password",
-							"value": "Cliente@123"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{base_url}}/auth/login",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"auth",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "03 — [POSITIVO] Criar Pedido (PIX — deve aprovar)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 201', () => pm.response.to.have.status(201));",
-							"const json = pm.response.json();",
-							"pm.test('Pedido tem ID', () => pm.expect(json.id).to.be.a('number'));",
-							"pm.test('Status EM_PREPARO', () => pm.expect(json.status).to.eql('EM_PREPARO'));",
-							"pm.test('Canal APP', () => pm.expect(json.canal_pedido).to.eql('APP'));",
-							"pm.collectionVariables.set('pedido_id', json.id);"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token_cliente}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"unidade_id\": 1,\n  \"canal_pedido\": \"APP\",\n  \"forma_pagamento\": \"PIX\",\n  \"itens\": [\n    { \"produto_id\": 1, \"quantidade\": 2 },\n    { \"produto_id\": 2, \"quantidade\": 1 }\n  ]\n}"
-				},
-				"url": {
-					"raw": "{{base_url}}/pedidos/",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"pedidos",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "04 — [POSITIVO] Listar Pedidos com filtro de canal",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 200', () => pm.response.to.have.status(200));",
-							"const json = pm.response.json();",
-							"pm.test('Retorna lista', () => pm.expect(json).to.be.an('array'));",
-							"pm.test('Todos os pedidos sao do canal APP', () => {",
-							"  json.forEach(p => pm.expect(p.canal_pedido).to.eql('APP'));",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token_admin}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/pedidos/?canal_pedido=APP",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"pedidos",
-						""
-					],
-					"query": [
-						{
-							"key": "canal_pedido",
-							"value": "APP"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "05 — [POSITIVO] Consultar Saldo de Fidelidade",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 200', () => pm.response.to.have.status(200));",
-							"const json = pm.response.json();",
-							"pm.test('Tem pontos_acumulados', () => pm.expect(json.pontos_acumulados).to.be.a('number'));",
-							"pm.test('Tem pontos_disponiveis', () => pm.expect(json.pontos_disponiveis).to.be.a('number'));",
-							"pm.test('Pontos acumulados > 0 apos pedido aprovado', () => pm.expect(json.pontos_acumulados).to.be.above(0));"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token_cliente}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/fidelidade/saldo",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"fidelidade",
-						"saldo"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "06 — [POSITIVO] Resgatar Pontos de Fidelidade",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 200', () => pm.response.to.have.status(200));",
-							"const json = pm.response.json();",
-							"pm.test('Mensagem de sucesso presente', () => pm.expect(json.message).to.be.a('string'));"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token_cliente}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"pontos\": 5\n}"
-				},
-				"url": {
-					"raw": "{{base_url}}/fidelidade/resgatar",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"fidelidade",
-						"resgatar"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "07 — [POSITIVO] Consultar Logs de Auditoria (ADMIN)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 200', () => pm.response.to.have.status(200));",
-							"const json = pm.response.json();",
-							"pm.test('Retorna lista de logs', () => pm.expect(json).to.be.an('array'));",
-							"pm.test('Logs tem campo acao', () => pm.expect(json[0].acao).to.be.a('string'));"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token_admin}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/auditoria/",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"auditoria",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "08 — [NEGATIVO] Login com senha errada — 401",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 401', () => pm.response.to.have.status(401));",
-							"const json = pm.response.json();",
-							"pm.test('Error CREDENCIAIS_INVALIDAS', () => pm.expect(json.detail.error).to.eql('CREDENCIAIS_INVALIDAS'));"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
-					}
-				],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "username",
-							"value": "admin@raizes.com"
-						},
-						{
-							"key": "password",
-							"value": "senhaerrada"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{base_url}}/auth/login",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"auth",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "09 — [NEGATIVO] Acessar Auditoria sem token — 401",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 401', () => pm.response.to.have.status(401));"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{base_url}}/auditoria/",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"auditoria",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "10 — [NEGATIVO] Auditoria com token de CLIENTE — 403",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 403', () => pm.response.to.have.status(403));",
-							"const json = pm.response.json();",
-							"pm.test('Error SEM_PERMISSAO', () => pm.expect(json.detail.error).to.eql('SEM_PERMISSAO'));"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token_cliente}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/auditoria/",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"auditoria",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "11 — [NEGATIVO] Resgatar mais pontos do que o saldo — 409",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 409', () => pm.response.to.have.status(409));",
-							"const json = pm.response.json();",
-							"pm.test('Error SALDO_INSUFICIENTE', () => pm.expect(json.detail.error).to.eql('SALDO_INSUFICIENTE'));"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token_cliente}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"pontos\": 99999\n}"
-				},
-				"url": {
-					"raw": "{{base_url}}/fidelidade/resgatar",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"fidelidade",
-						"resgatar"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "12 — [NEGATIVO] Criar Pedido com produto inexistente — 404",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Status 404', () => pm.response.to.have.status(404));"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{token_cliente}}"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"unidade_id\": 1,\n  \"canal_pedido\": \"APP\",\n  \"forma_pagamento\": \"PIX\",\n  \"itens\": [\n    { \"produto_id\": 9999, \"quantidade\": 1 }\n  ]\n}"
-				},
-				"url": {
-					"raw": "{{base_url}}/pedidos/",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"pedidos",
-						""
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "http://127.0.0.1:8000"
-		},
-		{
-			"key": "token_admin",
-			"value": ""
-		},
-		{
-			"key": "token_cliente",
-			"value": ""
-		},
-		{
-			"key": "pedido_id",
-			"value": ""
-		}
-	]
+  "info": {
+    "_postman_id": "c8557c2f-7a6b-4221-9ee7-1d9fdf0fdc3b",
+    "name": "Raizes do Nordeste — API Back-End",
+    "description": "Colecao de testes para o projeto academico UNINTER — Trilha Back-End. Cobre fluxo principal, autenticacao, fidelidade, auditoria e cenarios de erro.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55504697",
+    "_collection_link": "https://gui28032018-2596442.postman.co/workspace/gui28032018's-Workspace~70cf9bb9-049b-405a-874d-a24efb1b9a12/collection/55504697-c8557c2f-7a6b-4221-9ee7-1d9fdf0fdc3b?action=share&source=collection_link&creator=55504697"
+  },
+  "item": [
+    {
+      "name": "01 — [POSITIVO] Login ADMIN",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Retorna access_token', () => pm.expect(json.access_token).to.be.a('string'));",
+              "pm.test('Perfil ADMIN', () => pm.expect(json.perfil).to.eql('ADMIN'));",
+              "pm.collectionVariables.set('token_admin', json.access_token);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "username",
+              "value": "admin@raizes.com"
+            },
+            {
+              "key": "password",
+              "value": "Admin@123"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 — [POSITIVO] Login CLIENTE",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Retorna access_token', () => pm.expect(json.access_token).to.be.a('string'));",
+              "pm.test('Perfil CLIENTE', () => pm.expect(json.perfil).to.eql('CLIENTE'));",
+              "pm.collectionVariables.set('token_cliente', json.access_token);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "username",
+              "value": "maria@email.com"
+            },
+            {
+              "key": "password",
+              "value": "Cliente@123"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03 — [POSITIVO] Criar Pedido (PIX — deve aprovar)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('Pedido tem ID', () => pm.expect(json.id).to.be.a('number'));",
+              "pm.test('Status EM_PREPARO', () => pm.expect(json.status).to.eql('EM_PREPARO'));",
+              "pm.test('Canal APP', () => pm.expect(json.canal_pedido).to.eql('APP'));",
+              "pm.collectionVariables.set('pedido_id', json.id);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_cliente}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"unidade_id\": 1,\n  \"canal_pedido\": \"APP\",\n  \"forma_pagamento\": \"PIX\",\n  \"itens\": [\n    { \"produto_id\": 1, \"quantidade\": 2 },\n    { \"produto_id\": 2, \"quantidade\": 1 }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/pedidos/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pedidos",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 — [POSITIVO] Listar Pedidos com filtro de canal",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Retorna lista', () => pm.expect(json).to.be.an('array'));",
+              "pm.test('Todos os pedidos sao do canal APP', () => {",
+              "  json.forEach(p => pm.expect(p.canal_pedido).to.eql('APP'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/pedidos/?canal_pedido=APP",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pedidos",
+            ""
+          ],
+          "query": [
+            {
+              "key": "canal_pedido",
+              "value": "APP"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 — [POSITIVO] Consultar Saldo de Fidelidade",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Tem pontos_acumulados', () => pm.expect(json.pontos_acumulados).to.be.a('number'));",
+              "pm.test('Tem pontos_disponiveis', () => pm.expect(json.pontos_disponiveis).to.be.a('number'));",
+              "pm.test('Pontos acumulados > 0 apos pedido aprovado', () => pm.expect(json.pontos_acumulados).to.be.above(0));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_cliente}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/fidelidade/saldo",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "fidelidade",
+            "saldo"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06 — [POSITIVO] Resgatar Pontos de Fidelidade",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Mensagem de sucesso presente', () => pm.expect(json.message).to.be.a('string'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_cliente}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pontos\": 5\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/fidelidade/resgatar",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "fidelidade",
+            "resgatar"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 — [POSITIVO] Consultar Logs de Auditoria (ADMIN)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Retorna lista de logs', () => pm.expect(json).to.be.an('array'));",
+              "pm.test('Logs tem campo acao', () => pm.expect(json[0].acao).to.be.a('string'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auditoria/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auditoria",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "08 — [NEGATIVO] Login com senha errada — 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 401', () => pm.response.to.have.status(401));",
+              "const json = pm.response.json();",
+              "pm.test('Error CREDENCIAIS_INVALIDAS', () => pm.expect(json.detail.error).to.eql('CREDENCIAIS_INVALIDAS'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "username",
+              "value": "admin@raizes.com"
+            },
+            {
+              "key": "password",
+              "value": "senhaerrada"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "09 — [NEGATIVO] Acessar Auditoria sem token — 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 401', () => pm.response.to.have.status(401));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/auditoria/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auditoria",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10 — [NEGATIVO] Auditoria com token de CLIENTE — 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 403', () => pm.response.to.have.status(403));",
+              "const json = pm.response.json();",
+              "pm.test('Error SEM_PERMISSAO', () => pm.expect(json.detail.error).to.eql('SEM_PERMISSAO'));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_cliente}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auditoria/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auditoria",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11 — [NEGATIVO] Resgatar mais pontos do que o saldo — 409",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 409', () => pm.response.to.have.status(409));",
+              "const json = pm.response.json();",
+              "pm.test('Error SALDO_INSUFICIENTE', () => pm.expect(json.detail.error).to.eql('SALDO_INSUFICIENTE'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_cliente}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pontos\": 99999\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/fidelidade/resgatar",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "fidelidade",
+            "resgatar"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "12 — [NEGATIVO] Criar Pedido com produto inexistente — 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 404', () => pm.response.to.have.status(404));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_cliente}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"unidade_id\": 1,\n  \"canal_pedido\": \"APP\",\n  \"forma_pagamento\": \"PIX\",\n  \"itens\": [\n    { \"produto_id\": 9999, \"quantidade\": 1 }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/pedidos/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pedidos",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "13 — [POSITIVO] Consultar Pedido por ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Pedido consultado tem o mesmo ID salvo', () => pm.expect(json.id).to.eql(Number(pm.collectionVariables.get('pedido_id'))));",
+              "pm.test('Pedido possui pagamento', () => pm.expect(json.pagamento).to.be.an('object'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_cliente}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/pedidos/{{pedido_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pedidos",
+            "{{pedido_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "14 — [POSITIVO] Criar Pedido Recusado (MOCK_RECUSADO)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('Pedido tem ID', () => pm.expect(json.id).to.be.a('number'));",
+              "pm.test('Status PAGAMENTO_RECUSADO', () => pm.expect(json.status).to.eql('PAGAMENTO_RECUSADO'));",
+              "pm.test('Pagamento RECUSADO', () => pm.expect(json.pagamento.status).to.eql('RECUSADO'));",
+              "pm.test('Metodo MOCK_RECUSADO', () => pm.expect(json.pagamento.metodo).to.eql('MOCK_RECUSADO'));",
+              "pm.collectionVariables.set('pedido_recusado_id', json.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_cliente}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"unidade_id\": 1,\n  \"canal_pedido\": \"APP\",\n  \"forma_pagamento\": \"MOCK_RECUSADO\",\n  \"itens\": [\n    { \"produto_id\": 1, \"quantidade\": 1 }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/pedidos/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pedidos",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "15 — [POSITIVO] Criar Unidade Teste",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('Unidade tem ID', () => pm.expect(json.id).to.be.a('number'));",
+              "pm.test('Unidade ativa', () => pm.expect(json.ativa).to.eql(true));",
+              "pm.collectionVariables.set('unidade_teste_id', json.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Unidade Teste Soft Delete {{$timestamp}}\",\n  \"cidade\": \"Teste\",\n  \"estado\": \"TS\",\n  \"endereco\": \"Rua Teste\",\n  \"ativa\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/unidades/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "unidades",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "16 — [POSITIVO] Soft-delete Unidade Teste",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 204', () => pm.response.to.have.status(204));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_admin}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/unidades/{{unidade_teste_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "unidades",
+            "{{unidade_teste_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "17 — [POSITIVO] Listar Unidades Ativas",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "const unidadeTesteId = Number(pm.collectionVariables.get('unidade_teste_id'));",
+              "pm.test('Retorna lista', () => pm.expect(json).to.be.an('array'));",
+              "pm.test('Todas as unidades listadas estao ativas', () => {",
+              "  json.forEach(u => pm.expect(u.ativa).to.eql(true));",
+              "});",
+              "pm.test('Unidade removida por soft-delete nao aparece na listagem', () => {",
+              "  const encontrada = json.some(u => u.id === unidadeTesteId);",
+              "  pm.expect(encontrada).to.eql(false);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/unidades/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "unidades",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "token_admin",
+      "value": ""
+    },
+    {
+      "key": "token_cliente",
+      "value": ""
+    },
+    {
+      "key": "pedido_id",
+      "value": ""
+    },
+    {
+      "key": "pedido_recusado_id",
+      "value": ""
+    },
+    {
+      "key": "unidade_teste_id",
+      "value": ""
+    }
+  ]
 }
