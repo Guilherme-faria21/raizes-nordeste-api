@@ -1,220 +1,628 @@
-# Raizes do Nordeste — API Back-End
+# API REST para Gestão de Pedidos — Rede Raízes do Nordeste
 
-Projeto academico desenvolvido para a disciplina de Projeto Multidisciplinar (UNINTER).
-API REST construida com FastAPI e SQLite, modelando o sistema de pedidos e gestao da rede de restaurantes "Raizes do Nordeste".
+Projeto desenvolvido para a disciplina **Projeto Multidisciplinar — Trilha Back-End** do curso de **Tecnologia em Análise e Desenvolvimento de Sistemas**.
+
+A aplicação implementa uma API REST para gestão de pedidos da rede fictícia **Raízes do Nordeste**, com autenticação JWT, controle de acesso por perfis, unidades, produtos, estoque, pedidos, pagamento mock determinístico, fidelidade e auditoria.
 
 ---
 
-## Repositorio
+## 1. Visão Geral
 
+O objetivo do projeto é demonstrar um fluxo back-end funcional, persistente e testável para uma rede de restaurantes/lanchonetes com múltiplas unidades e múltiplos canais de pedido.
+
+Fluxo principal implementado:
+
+```text
+Cliente autenticado
+        ↓
+Criação de pedido
+        ↓
+Validação de unidade, produtos e estoque
+        ↓
+Pagamento mock determinístico
+        ↓
+Atualização automática do status do pedido
+        ↓
+Baixa de estoque em caso de aprovação
+        ↓
+Acúmulo de pontos de fidelidade
+        ↓
+Registro de auditoria
 ```
-https://github.com/Guilherme-faria21/raizes-nordeste-api.git
+
+Fluxo obrigatório escolhido no roteiro:
+
+```text
+Pedido → Pagamento mock → Atualização de status
 ```
 
 ---
 
-## Tecnologias
+## 2. Funcionalidades Implementadas
 
-- Python 3.12.3
-- FastAPI 0.136.3
-- SQLAlchemy 2.0.50
-- SQLite (banco de dados local)
-- JWT via python-jose
-- Hash de senha: bcrypt via passlib (pre-processamento SHA256 + base64)
-- Uvicorn 0.49.0
+- Cadastro de usuários com consentimento LGPD.
+- Login com JWT.
+- Autorização por perfis/roles.
+- Gestão de unidades.
+- Gestão de produtos.
+- Consulta e entrada de estoque por unidade.
+- Registro de movimentações de estoque.
+- Criação de pedidos com itens, canal de origem e forma de pagamento.
+- Campo de multicanalidade no pedido: `canal_pedido`.
+- Filtro de pedidos por canal.
+- Pagamento mock determinístico.
+- Atualização automática do status do pedido conforme pagamento.
+- Baixa de estoque em pedidos aprovados.
+- Programa de fidelidade com consulta e resgate de pontos.
+- Auditoria de ações relevantes.
+- Soft-delete em unidades e produtos.
+- Documentação automática via Swagger/OpenAPI.
+- Coleção Postman com testes positivos e negativos.
 
 ---
 
-## Pre-requisitos
+## 3. Requisitos Atendidos
 
-- Python 3.10 ou superior
-- pip
-- Git
+### 3.1 Requisitos Funcionais
+
+| ID | Requisito | Status |
+|---|---|---|
+| RF01 | Cadastro de usuário com nome, e-mail, senha, perfil e consentimento LGPD | Implementado |
+| RF02 | Login com e-mail e senha, retornando token JWT | Implementado |
+| RF03 | Listagem e consulta de unidades ativas | Implementado |
+| RF04 | Cadastro, atualização e desativação de unidades | Implementado |
+| RF05 | Listagem e consulta de produtos ativos | Implementado |
+| RF06 | Cadastro, atualização e desativação de produtos | Implementado |
+| RF07 | Consulta de estoque por unidade | Implementado |
+| RF08 | Registro de entrada de estoque | Implementado |
+| RF09 | Consulta de movimentações de estoque | Implementado |
+| RF10 | Criação de pedido com unidade, canal, forma de pagamento e itens | Implementado |
+| RF11 | Validação de estoque antes da criação do pedido | Implementado |
+| RF12 | Processamento de pagamento mock | Implementado |
+| RF13 | Atualização de status conforme resultado do pagamento | Implementado |
+| RF14 | Baixa de estoque em pedidos aprovados | Implementado |
+| RF15 | Acúmulo de pontos de fidelidade em pedidos aprovados | Implementado |
+| RF16 | Consulta de saldo de fidelidade pelo cliente | Implementado |
+| RF17 | Consulta de saldo de fidelidade por administradores/gerentes | Implementado |
+| RF18 | Resgate de pontos | Implementado |
+| RF19 | Registro de auditoria | Implementado |
+| RF20 | Consulta de auditoria com filtros | Implementado |
+| RF21 | Atualização manual de status pela cozinha | Documentado como regra conceitual |
+| RF22 | Promoções/campanhas | Documentado como proposta |
+
+### 3.2 Requisitos Não Funcionais
+
+- Arquitetura modular.
+- Persistência em banco de dados.
+- ORM com SQLAlchemy.
+- Autenticação JWT.
+- Autorização por perfil.
+- Senhas armazenadas com hash.
+- Documentação Swagger/OpenAPI.
+- Padrão de erro em JSON.
+- Auditoria de ações sensíveis.
+- Pagamento mock determinístico.
+- Testes reproduzíveis via Postman.
 
 ---
 
-## Como executar o projeto
+## 4. Stack Tecnológica
 
-### 1. Clonar o repositorio
+| Tecnologia | Função |
+|---|---|
+| Python | Linguagem principal |
+| FastAPI | Framework web |
+| Uvicorn | Servidor ASGI |
+| SQLAlchemy | ORM |
+| SQLite | Banco de dados local |
+| Pydantic | Validação de dados |
+| Passlib | Hashing de senhas |
+| bcrypt | Algoritmo de hash usado pelo Passlib |
+| python-jose | Geração e validação de JWT |
+| python-dotenv | Variáveis de ambiente |
+| python-multipart | Suporte a login via form-data |
+| email-validator | Validação de e-mail no Pydantic |
+| Postman | Testes da API |
+
+---
+
+## 5. Estrutura do Projeto
+
+```text
+raizes_nordeste/
+├── main.py
+├── seed.py
+├── requirements.txt
+├── README.md
+├── .env.example
+├── raizes_nordeste_postman.json
+└── app/
+    ├── api/
+    │   ├── auth.py
+    │   ├── unidades.py
+    │   ├── produtos.py
+    │   ├── estoque.py
+    │   ├── pedidos.py
+    │   ├── fidelidade.py
+    │   ├── auditoria.py
+    │   └── deps.py
+    ├── application/
+    │   ├── auditoria_service.py
+    │   ├── fidelidade_service.py
+    │   └── pagamento_service.py
+    ├── infrastructure/
+    │   ├── database.py
+    │   ├── models.py
+    │   └── security.py
+    └── domain/
+        └── __init__.py
+```
+
+---
+
+## 6. Como Executar o Projeto
+
+### 6.1 Clonar o repositório
 
 ```bash
 git clone https://github.com/Guilherme-faria21/raizes-nordeste-api.git
-cd raizes-nordeste-api 
+cd raizes-nordeste-api
 ```
 
-### 2. Criar e ativar o ambiente virtual
+### 6.2 Criar e ativar ambiente virtual
+
+Linux/macOS:
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-### 3. Instalar as dependencias
+Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+### 6.3 Instalar dependências
 
 ```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Configurar as variaveis de ambiente
+### 6.4 Configurar variáveis de ambiente
 
-Copie o arquivo de exemplo e edite com seus valores:
+O projeto possui o arquivo `.env.example`.
+
+Crie uma cópia chamada `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-O arquivo `.env` deve conter:
+Exemplo de variáveis esperadas:
 
-```
-DATABASE_URL=sqlite:///./raizes.db
-SECRET_KEY=sua_chave_secreta_aqui
+```env
+SECRET_KEY=sua-chave-secreta
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
+DATABASE_URL=sqlite:///./raizes.db
 ```
 
-Para gerar uma SECRET_KEY segura: `python3 -c "import secrets; print(secrets.token_hex(32))"`
+Caso o projeto já esteja configurado com valores padrão compatíveis com ambiente local, basta manter o `.env.example` como referência.
 
-### 5. Popular o banco de dados (seed)
+### 6.5 Criar banco e executar seed
 
 ```bash
 python seed.py
 ```
 
-Este comando cria as tabelas e insere os dados iniciais:
+O seed cria usuários, unidades, produtos e estoques iniciais.
 
-- 4 usuarios (ADMIN, GERENTE, 2 CLIENTEs)
-- 3 unidades (Recife, Fortaleza, Natal)
-- 6 produtos tipicos nordestinos
-- Estoque inicial de 50 unidades por produto em cada unidade
+Saída esperada:
 
-O script e idempotente — pode ser executado multiplas vezes sem duplicar dados.
+```text
+Seed concluido com sucesso!
 
-### 6. Iniciar a API
+Credenciais para teste:
+  ADMIN   -> admin@raizes.com   / Admin@123
+  GERENTE -> gerente@raizes.com / Gerente@123
+  CLIENTE -> maria@email.com    / Cliente@123
+  CLIENTE -> joao@email.com     / Cliente@123
+```
+
+### 6.6 Iniciar a API
 
 ```bash
 uvicorn main:app --reload
 ```
 
-A API estara disponivel em: `http://127.0.0.1:8000`
+API local:
+
+```text
+http://127.0.0.1:8000
+```
 
 ---
 
-## Documentacao (Swagger)
+## 7. Documentação Swagger/OpenAPI
 
-Apos iniciar a API, acesse:
+Com a API rodando, acesse:
 
-```
+Swagger UI:
+
+```text
 http://127.0.0.1:8000/docs
 ```
 
-A documentacao interativa (OpenAPI/Swagger) lista todos os endpoints, contratos de request/response e permite testar as rotas diretamente pelo navegador.
+OpenAPI JSON:
 
----
-
-## Credenciais de teste (apos o seed)
-
-| Perfil  | E-mail                | Senha        |
-|---------|-----------------------|--------------|
-| ADMIN   | admin@raizes.com      | Admin@123    |
-| GERENTE | gerente@raizes.com    | Gerente@123  |
-| CLIENTE | maria@email.com       | Cliente@123  |
-| CLIENTE | joao@email.com        | Cliente@123  |
-
----
-
-## Colecao de testes Postman
-
-O arquivo `raizes_nordeste_postman.json` na raiz do repositorio contem 12 cenarios de teste (7 positivos, 5 negativos) cobrindo:
-
-- Autenticacao (login valido e senha errada)
-- Criacao de pedido e validacao de status
-- Filtro de pedidos por canal
-- Programa de fidelidade (saldo e resgate)
-- Logs de auditoria
-- Cenarios de erro: 401, 403, 404, 409
-
-### Como importar
-
-1. Abra o Postman
-2. Clique em **Import**
-3. Selecione o arquivo `raizes_nordeste_postman.json`
-4. Execute a colecao pelo **Runner** na ordem de 01 a 12
-
-Os requests 03 em diante dependem dos tokens salvos automaticamente pelos requests 01 e 02. Execute sempre na ordem.
-
----
-
-## Arquitetura do projeto
-
-```
-raizes_nordeste/
-├── main.py                          # Ponto de entrada da aplicacao
-├── seed.py                          # Script de dados iniciais
-├── requirements.txt                 # Dependencias do projeto
-├── .env                             # Variaveis de ambiente (nao versionar)
-├── .env.example                     # Modelo de variaveis de ambiente
-├── raizes_nordeste_postman.json     # Colecao de testes Postman
-└── app/
-    ├── api/                         # Routers e endpoints (controllers)
-    │   ├── auth.py                  # POST /auth/login
-    │   ├── unidades.py              # CRUD /unidades
-    │   ├── produtos.py              # CRUD /produtos
-    │   ├── estoque.py               # Movimentacao /estoque
-    │   ├── pedidos.py               # Fluxo de pedidos /pedidos
-    │   ├── fidelidade.py            # Programa de pontos /fidelidade
-    │   └── auditoria.py             # Logs de auditoria /auditoria
-    ├── application/                 # Servicos e casos de uso
-    │   ├── fidelidade_service.py    # Logica de acumulo e resgate de pontos
-    │   └── auditoria_service.py     # Registro de logs de auditoria
-    └── infrastructure/              # Persistencia e seguranca
-        ├── database.py              # Configuracao do SQLAlchemy
-        ├── models.py                # Modelos ORM (tabelas)
-        └── security.py             # Hash de senha e JWT
+```text
+http://127.0.0.1:8000/openapi.json
 ```
 
 ---
 
-## Endpoints principais
+## 8. Credenciais de Teste
 
-| Metodo | Rota                        | Descricao                          | Auth       |
-|--------|-----------------------------|------------------------------------|------------|
-| POST   | /auth/login                 | Autenticacao, retorna JWT          | Nao        |
-| GET    | /unidades/                  | Lista unidades ativas              | Nao        |
-| GET    | /produtos/                  | Lista produtos ativos              | Nao        |
-| POST   | /estoque/entrada            | Registra entrada de estoque        | ADMIN/GER  |
-| GET    | /estoque/{unidade_id}       | Consulta estoque por unidade       | Autenticado|
-| POST   | /pedidos/                   | Cria pedido com pagamento mock     | CLIENTE    |
-| GET    | /pedidos/                   | Lista pedidos (filtro ?canal_pedido)| Autenticado|
-| GET    | /fidelidade/saldo           | Consulta pontos do usuario         | Autenticado|
-| POST   | /fidelidade/resgatar        | Resgata pontos de fidelidade       | Autenticado|
-| GET    | /auditoria/                 | Lista logs de auditoria            | ADMIN      |
+| Perfil | E-mail | Senha |
+|---|---|---|
+| ADMIN | `admin@raizes.com` | `Admin@123` |
+| GERENTE | `gerente@raizes.com` | `Gerente@123` |
+| CLIENTE | `maria@email.com` | `Cliente@123` |
+| CLIENTE | `joao@email.com` | `Cliente@123` |
 
 ---
 
-## Seguranca e LGPD
+## 9. Endpoints Principais
 
-- Senhas armazenadas com hash bcrypt (pre-processamento SHA256 + base64)
-- Autenticacao via JWT (Bearer Token), expiracao configuravel via .env
-- Autorizacao por perfis: ADMIN, GERENTE, ATENDENTE, CLIENTE
-- Consentimento LGPD registrado obrigatoriamente no cadastro de usuario
-- Soft-delete em todos os recursos (campo `ativo = False`, sem exclusao fisica)
-- Logs de auditoria para acoes sensiveis: LOGIN, CRIAR_PEDIDO, PAGAMENTO_RECUSADO, RESGATAR_PONTOS, ENTRADA_ESTOQUE
-- Dados pessoais nao expostos em respostas de erro
+### 9.1 Autenticação
+
+| Método | Endpoint | Acesso | Descrição |
+|---|---|---|---|
+| POST | `/auth/registro` | Público | Cadastra usuário |
+| POST | `/auth/login` | Público | Autentica usuário e retorna JWT |
+
+Exemplo de login:
+
+```bash
+curl -X POST http://127.0.0.1:8000/auth/login \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=admin@raizes.com&password=Admin@123"
+```
+
+### 9.2 Unidades
+
+| Método | Endpoint | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/unidades/` | Público | Lista unidades ativas |
+| GET | `/unidades/{unidade_id}` | Público | Consulta unidade |
+| POST | `/unidades/` | ADMIN / GERENTE | Cria unidade |
+| PUT | `/unidades/{unidade_id}` | ADMIN / GERENTE | Atualiza unidade |
+| DELETE | `/unidades/{unidade_id}` | ADMIN | Soft-delete da unidade |
+
+### 9.3 Produtos
+
+| Método | Endpoint | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/produtos/` | Público | Lista produtos ativos |
+| GET | `/produtos/{produto_id}` | Público | Consulta produto |
+| POST | `/produtos/` | ADMIN / GERENTE | Cria produto |
+| PUT | `/produtos/{produto_id}` | ADMIN / GERENTE | Atualiza produto |
+| DELETE | `/produtos/{produto_id}` | ADMIN / GERENTE | Soft-delete do produto |
+
+### 9.4 Estoque
+
+| Método | Endpoint | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/estoque/{unidade_id}` | ADMIN / GERENTE | Consulta estoque da unidade |
+| POST | `/estoque/entrada` | ADMIN / GERENTE | Registra entrada |
+| GET | `/estoque/{unidade_id}/movimentacoes` | ADMIN / GERENTE | Lista movimentações |
+
+### 9.5 Pedidos
+
+| Método | Endpoint | Acesso | Descrição |
+|---|---|---|---|
+| POST | `/pedidos/` | CLIENTE | Cria pedido e processa pagamento mock |
+| GET | `/pedidos/` | ADMIN / GERENTE / CLIENTE | Lista pedidos conforme perfil |
+| GET | `/pedidos/{pedido_id}` | ADMIN / GERENTE / dono do pedido | Consulta pedido |
+
+Filtro por canal:
+
+```text
+GET /pedidos/?canal_pedido=APP
+```
+
+### 9.6 Fidelidade
+
+| Método | Endpoint | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/fidelidade/saldo` | CLIENTE | Consulta saldo próprio |
+| GET | `/fidelidade/saldo/{usuario_id}` | ADMIN / GERENTE | Consulta saldo de outro usuário |
+| POST | `/fidelidade/resgatar` | CLIENTE | Resgata pontos |
+
+### 9.7 Auditoria
+
+| Método | Endpoint | Acesso | Descrição |
+|---|---|---|---|
+| GET | `/auditoria/` | ADMIN | Lista logs de auditoria |
 
 ---
 
-## Regras de negocio principais
+## 10. Fluxo Principal
 
-- Estoque e baixado apenas quando o pagamento e aprovado
-- Pagamento mock: PIX e aprovado, DINHEIRO aprovado, CREDITO recusado (simulacao)
-- Programa de fidelidade: 1 ponto por R$1,00 gasto (arredondamento para baixo)
-- Pontos so acumulam em pedidos com pagamento aprovado
-- Canal do pedido obrigatorio: APP, TOTEM, BALCAO, PICKUP ou WEB
-- Todos os deletes sao logicos (soft-delete)
+### 10.1 Login do cliente
+
+```bash
+curl -X POST http://127.0.0.1:8000/auth/login \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=maria@email.com&password=Cliente@123"
+```
+
+O retorno contém o token JWT:
+
+```json
+{
+  "access_token": "TOKEN_JWT",
+  "token_type": "bearer",
+  "perfil": "CLIENTE",
+  "nome": "Maria"
+}
+```
+
+### 10.2 Criar pedido aprovado
+
+```bash
+curl -X POST http://127.0.0.1:8000/pedidos/ \
+  -H "Authorization: Bearer TOKEN_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "unidade_id": 1,
+    "canal_pedido": "APP",
+    "forma_pagamento": "PIX",
+    "itens": [
+      {"produto_id": 1, "quantidade": 1}
+    ]
+  }'
+```
+
+Resposta esperada:
+
+```json
+{
+  "status": "EM_PREPARO",
+  "forma_pagamento": "PIX",
+  "pagamento": {
+    "status": "APROVADO",
+    "metodo": "PIX"
+  }
+}
+```
+
+### 10.3 Criar pedido recusado
+
+```bash
+curl -X POST http://127.0.0.1:8000/pedidos/ \
+  -H "Authorization: Bearer TOKEN_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "unidade_id": 1,
+    "canal_pedido": "APP",
+    "forma_pagamento": "MOCK_RECUSADO",
+    "itens": [
+      {"produto_id": 1, "quantidade": 1}
+    ]
+  }'
+```
+
+Resposta esperada:
+
+```json
+{
+  "status": "PAGAMENTO_RECUSADO",
+  "forma_pagamento": "MOCK_RECUSADO",
+  "pagamento": {
+    "status": "RECUSADO",
+    "metodo": "MOCK_RECUSADO"
+  }
+}
+```
 
 ---
 
-## Como rodar os testes
+## 11. Pagamento Mock Determinístico
 
-Importe a colecao `raizes_nordeste_postman.json` no Postman e execute pelo Runner.
-Resultado esperado: 30 testes — Passed (30), Failed (0).
+O serviço de pagamento mock está em:
+
+```text
+app/application/pagamento_service.py
+```
+
+Métodos aprovados:
+
+- `PIX`
+- `CARTAO_CREDITO`
+- `CARTAO_DEBITO`
+- `DINHEIRO`
+- `MOCK`
+
+Métodos recusados:
+
+- `RECUSADO`
+- `MOCK_RECUSADO`
+- `CARTAO_RECUSADO`
+- `CARTAO_CREDITO_RECUSADO`
+
+Esse comportamento determinístico facilita a execução dos testes, porque o mesmo cenário sempre retorna o mesmo resultado.
+
+---
+
+## 12. Multicanalidade
+
+O pedido possui o campo:
+
+```text
+canal_pedido
+```
+
+Valores esperados:
+
+- `APP`
+- `TOTEM`
+- `BALCAO`
+- `PICKUP`
+- `WEB`
+
+Esse campo permite rastrear a origem do pedido.
+
+Exemplo:
+
+```json
+{
+  "canal_pedido": "APP"
+}
+```
+
+Filtro por canal:
+
+```text
+GET /pedidos/?canal_pedido=APP
+```
+
+---
+
+## 13. Segurança e LGPD
+
+Controles implementados:
+
+- Hash de senha com Passlib + bcrypt.
+- Preparação de senha com SHA-256 + Base64 antes do bcrypt.
+- JWT para autenticação.
+- Autorização por perfil.
+- Consentimento LGPD no cadastro.
+- Minimização de dados.
+- Soft-delete em recursos principais.
+- Auditoria de ações relevantes.
+- Não armazenamento de senha em texto puro.
+
+---
+
+## 14. Testes com Postman
+
+A coleção Postman está disponível no repositório:
+
+```text
+raizes_nordeste_postman.json
+```
+
+A execução final da coleção resultou em:
+
+```text
+46/46 asserções aprovadas
+```
+
+### 14.1 Como executar os testes
+
+1. Inicie a API localmente:
+
+```bash
+uvicorn main:app --reload
+```
+
+2. Importe o arquivo no Postman:
+
+```text
+raizes_nordeste_postman.json
+```
+
+3. Confirme a variável:
+
+```text
+base_url = http://127.0.0.1:8000
+```
+
+4. Execute a coleção na ordem.
+
+A coleção armazena automaticamente tokens e IDs gerados durante os testes.
+
+### 14.2 Cenários cobertos
+
+| ID | Cenário | Resultado esperado |
+|---|---|---|
+| T01 | Login administrador válido | 200 + token ADMIN |
+| T02 | Login cliente válido | 200 + token CLIENTE |
+| T03 | Criar pedido aprovado | 201 + status `EM_PREPARO` |
+| T04 | Listar pedidos por canal | 200 + lista filtrada |
+| T05 | Consultar pedido por ID | 200 + dados do pedido |
+| T06 | Criar pedido recusado | 201 + status `PAGAMENTO_RECUSADO` |
+| T07 | Consultar saldo de fidelidade | 200 + saldo |
+| T08 | Resgatar pontos | 200 + saldo atualizado |
+| T09 | Consultar auditoria como ADMIN | 200 + logs |
+| T10 | Criar unidade teste | 201 + unidade ativa |
+| T11 | Soft-delete de unidade | 204 |
+| T12 | Listar unidades ativas | 200 + apenas ativas |
+| T13 | Login com senha inválida | 401 |
+| T14 | Auditoria sem token | 401 |
+| T15 | Cliente acessa auditoria | 403 |
+| T16 | Resgate acima do saldo | 409 |
+| T17 | Pedido com produto inexistente | 404 |
+
+---
+
+## 15. Validação Complementar
+
+Também foi executada validação sintática dos módulos principais:
+
+```bash
+python -m compileall app main.py seed.py
+```
+
+Resultado: execução concluída sem erros.
+
+Também foi validado o acesso ao OpenAPI:
+
+```text
+GET /openapi.json
+```
+
+Resultado: HTTP 200.
+
+---
+
+## 16. Histórico de Commits Relevantes
+
+Commits finais de estabilização:
+
+```text
+fix: add email-validator dependency
+fix: add python-multipart dependency
+fix: pin bcrypt version for passlib compatibility
+fix: make mock payment deterministic
+fix: apply soft delete to units
+test: add postman coverage for rejected payment and units
+```
+
+---
+
+## 17. Observações de Escopo
+
+Itens documentados como proposta/conceito para evolução:
+
+- Atualização manual de status pela cozinha:
+  - `EM_PREPARO → PRONTO → ENTREGUE / CANCELADO`
+- Promoções e campanhas com desconto no pedido.
+
+Esses itens foram documentados para atender ao escopo conceitual do estudo de caso, mas o MVP executável priorizou o fluxo pedido → pagamento mock → atualização automática de status.
+
+---
+
+## 18. Referências
+
+- FastAPI Documentation: https://fastapi.tiangolo.com
+- SQLAlchemy Documentation: https://docs.sqlalchemy.org
+- Pydantic Documentation: https://docs.pydantic.dev
+- Passlib Documentation: https://passlib.readthedocs.io
+- Python JOSE Documentation: https://python-jose.readthedocs.io
+- LGPD — Lei nº 13.709/2018
