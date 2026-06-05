@@ -32,14 +32,14 @@ class UnidadeResponse(BaseModel):
 def listar_unidades(
     db: Session = Depends(get_db)
 ):
-    return db.query(Unidade).all()
+    return db.query(Unidade).filter(Unidade.ativa == True).all()
 
 @router.get("/{unidade_id}", response_model=UnidadeResponse)
 def buscar_unidade(
     unidade_id: int,
     db: Session = Depends(get_db)
 ):
-    unidade = db.query(Unidade).filter(Unidade.id == unidade_id).first()
+    unidade = db.query(Unidade).filter(Unidade.id == unidade_id, Unidade.ativa == True).first()
     if not unidade:
         raise HTTPException(status_code=404, detail={
             "error": "UNIDADE_NAO_ENCONTRADA",
@@ -69,7 +69,7 @@ def atualizar_unidade(
     db: Session = Depends(get_db),
     usuario=Depends(require_perfil("ADMIN", "GERENTE"))
 ):
-    unidade = db.query(Unidade).filter(Unidade.id == unidade_id).first()
+    unidade = db.query(Unidade).filter(Unidade.id == unidade_id, Unidade.ativa == True).first()
     if not unidade:
         raise HTTPException(status_code=404, detail={
             "error": "UNIDADE_NAO_ENCONTRADA",
@@ -99,5 +99,7 @@ def deletar_unidade(
             "timestamp": datetime.utcnow().isoformat(),
             "path": f"/unidades/{unidade_id}"
         })
-    db.delete(unidade)
+    unidade.ativa = False
+    db.commit()
+    return None
     db.commit()
