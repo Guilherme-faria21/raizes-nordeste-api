@@ -1,29 +1,40 @@
-import random
-from datetime import datetime
+from datetime import datetime, timezone
+
 
 def processar_pagamento(valor: float, metodo: str) -> dict:
     """
-    Mock de pagamento.
-    - PIX: 95% de aprovação
-    - CARTAO_CREDITO: 85% de aprovação
-    - CARTAO_DEBITO: 90% de aprovação
-    - DINHEIRO: sempre aprovado
+    Mock determinístico de pagamento.
+
+    Métodos aprovados:
+    - PIX
+    - CARTAO_CREDITO
+    - CARTAO_DEBITO
+    - DINHEIRO
+    - MOCK
+
+    Métodos recusados:
+    - RECUSADO
+    - MOCK_RECUSADO
+    - CARTAO_RECUSADO
+    - CARTAO_CREDITO_RECUSADO
     """
-    taxas_aprovacao = {
-        "PIX": 0.95,
-        "CARTAO_CREDITO": 0.85,
-        "CARTAO_DEBITO": 0.90,
-        "DINHEIRO": 1.0
+
+    metodo_normalizado = (metodo or "MOCK").upper()
+
+    metodos_recusados = {
+        "RECUSADO",
+        "MOCK_RECUSADO",
+        "CARTAO_RECUSADO",
+        "CARTAO_CREDITO_RECUSADO",
     }
 
-    taxa = taxas_aprovacao.get(metodo.upper(), 0.80)
-    aprovado = random.random() < taxa
+    aprovado = metodo_normalizado not in metodos_recusados
 
     return {
         "aprovado": aprovado,
-        "metodo": metodo.upper(),
+        "metodo": metodo_normalizado,
         "valor": valor,
-        "timestamp": datetime.utcnow().isoformat(),
-        "codigo_autorizacao": f"AUTH-{random.randint(100000, 999999)}" if aprovado else None,
-        "motivo_recusa": None if aprovado else "Transação não autorizada pela operadora."
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "codigo_autorizacao": f"AUTH-MOCK-{metodo_normalizado}" if aprovado else None,
+        "motivo_recusa": None if aprovado else "Transação recusada pelo mock de pagamento.",
     }
