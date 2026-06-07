@@ -36,25 +36,14 @@
         "body": {
           "mode": "urlencoded",
           "urlencoded": [
-            {
-              "key": "username",
-              "value": "admin@raizes.com"
-            },
-            {
-              "key": "password",
-              "value": "Admin@123"
-            }
+            { "key": "username", "value": "admin@raizes.com" },
+            { "key": "password", "value": "Admin@123" }
           ]
         },
         "url": {
           "raw": "{{base_url}}/auth/login",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "auth",
-            "login"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["auth", "login"]
         }
       },
       "response": []
@@ -87,25 +76,14 @@
         "body": {
           "mode": "urlencoded",
           "urlencoded": [
-            {
-              "key": "username",
-              "value": "maria@email.com"
-            },
-            {
-              "key": "password",
-              "value": "Cliente@123"
-            }
+            { "key": "username", "value": "maria@email.com" },
+            { "key": "password", "value": "Cliente@123" }
           ]
         },
         "url": {
           "raw": "{{base_url}}/auth/login",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "auth",
-            "login"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["auth", "login"]
         }
       },
       "response": []
@@ -133,14 +111,8 @@
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_cliente}}"
-          }
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
         ],
         "body": {
           "mode": "raw",
@@ -148,13 +120,8 @@
         },
         "url": {
           "raw": "{{base_url}}/pedidos/",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "pedidos",
-            ""
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["pedidos", ""]
         }
       },
       "response": []
@@ -180,26 +147,13 @@
       "request": {
         "method": "GET",
         "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_admin}}"
-          }
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
         ],
         "url": {
           "raw": "{{base_url}}/pedidos/?canal_pedido=APP",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "pedidos",
-            ""
-          ],
-          "query": [
-            {
-              "key": "canal_pedido",
-              "value": "APP"
-            }
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["pedidos", ""],
+          "query": [{ "key": "canal_pedido", "value": "APP" }]
         }
       },
       "response": []
@@ -224,20 +178,12 @@
       "request": {
         "method": "GET",
         "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_cliente}}"
-          }
+          { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
         ],
         "url": {
           "raw": "{{base_url}}/fidelidade/saldo",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "fidelidade",
-            "saldo"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["fidelidade", "saldo"]
         }
       },
       "response": []
@@ -260,14 +206,8 @@
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_cliente}}"
-          }
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
         ],
         "body": {
           "mode": "raw",
@@ -275,13 +215,8 @@
         },
         "url": {
           "raw": "{{base_url}}/fidelidade/resgatar",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "fidelidade",
-            "resgatar"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["fidelidade", "resgatar"]
         }
       },
       "response": []
@@ -305,20 +240,12 @@
       "request": {
         "method": "GET",
         "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_admin}}"
-          }
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
         ],
         "url": {
           "raw": "{{base_url}}/auditoria/",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "auditoria",
-            ""
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["auditoria", ""]
         }
       },
       "response": []
@@ -341,33 +268,19 @@
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/x-www-form-urlencoded"
-          }
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
         ],
         "body": {
           "mode": "urlencoded",
           "urlencoded": [
-            {
-              "key": "username",
-              "value": "admin@raizes.com"
-            },
-            {
-              "key": "password",
-              "value": "senhaerrada"
-            }
+            { "key": "username", "value": "admin@raizes.com" },
+            { "key": "password", "value": "senhaerrada" }
           ]
         },
         "url": {
           "raw": "{{base_url}}/auth/login",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "auth",
-            "login"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["auth", "login"]
         }
       },
       "response": []
@@ -390,13 +303,8 @@
         "header": [],
         "url": {
           "raw": "{{base_url}}/auditoria/",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "auditoria",
-            ""
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["auditoria", ""]
         }
       },
       "response": []
@@ -421,20 +329,12 @@
       "request": {
         "method": "GET",
         "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_cliente}}"
-          }
+          { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
         ],
         "url": {
           "raw": "{{base_url}}/auditoria/",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "auditoria",
-            ""
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["auditoria", ""]
         }
       },
       "response": []
@@ -457,14 +357,8 @@
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_cliente}}"
-          }
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
         ],
         "body": {
           "mode": "raw",
@@ -472,13 +366,8 @@
         },
         "url": {
           "raw": "{{base_url}}/fidelidade/resgatar",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "fidelidade",
-            "resgatar"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["fidelidade", "resgatar"]
         }
       },
       "response": []
@@ -499,14 +388,8 @@
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_cliente}}"
-          }
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
         ],
         "body": {
           "mode": "raw",
@@ -514,13 +397,8 @@
         },
         "url": {
           "raw": "{{base_url}}/pedidos/",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "pedidos",
-            ""
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["pedidos", ""]
         }
       },
       "response": []
@@ -544,20 +422,12 @@
       "request": {
         "method": "GET",
         "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_cliente}}"
-          }
+          { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
         ],
         "url": {
           "raw": "{{base_url}}/pedidos/{{pedido_id}}",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "pedidos",
-            "{{pedido_id}}"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["pedidos", "{{pedido_id}}"]
         }
       },
       "response": []
@@ -584,14 +454,8 @@
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_cliente}}"
-          }
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
         ],
         "body": {
           "mode": "raw",
@@ -599,13 +463,8 @@
         },
         "url": {
           "raw": "{{base_url}}/pedidos/",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "pedidos",
-            ""
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["pedidos", ""]
         }
       },
       "response": []
@@ -630,14 +489,8 @@
       "request": {
         "method": "POST",
         "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_admin}}"
-          }
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
         ],
         "body": {
           "mode": "raw",
@@ -645,13 +498,8 @@
         },
         "url": {
           "raw": "{{base_url}}/unidades/",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "unidades",
-            ""
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["unidades", ""]
         }
       },
       "response": []
@@ -672,20 +520,12 @@
       "request": {
         "method": "DELETE",
         "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token_admin}}"
-          }
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
         ],
         "url": {
           "raw": "{{base_url}}/unidades/{{unidade_teste_id}}",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "unidades",
-            "{{unidade_teste_id}}"
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["unidades", "{{unidade_teste_id}}"]
         }
       },
       "response": []
@@ -718,42 +558,87 @@
         "header": [],
         "url": {
           "raw": "{{base_url}}/unidades/",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "unidades",
-            ""
-          ]
+          "host": ["{{base_url}}"],
+          "path": ["unidades", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "18 — [POSITIVO] Atualizar status do pedido: EM_PREPARO → PRONTO (cozinha)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('status_atual é PRONTO', () => pm.expect(json.status_atual).to.eql('PRONTO'));",
+              "pm.test('status_anterior é EM_PREPARO', () => pm.expect(json.status_anterior).to.eql('EM_PREPARO'));",
+              "pm.test('pedido_id correto', () => pm.expect(json.pedido_id).to.eql(Number(pm.collectionVariables.get('pedido_id'))));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"novo_status\": \"PRONTO\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/pedidos/{{pedido_id}}/status",
+          "host": ["{{base_url}}"],
+          "path": ["pedidos", "{{pedido_id}}", "status"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "19 — [NEGATIVO] Transicao de status invalida (PRONTO → EM_PREPARO) — 422",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 422', () => pm.response.to.have.status(422));",
+              "const json = pm.response.json();",
+              "pm.test('Error TRANSICAO_INVALIDA', () => pm.expect(json.detail.error).to.eql('TRANSICAO_INVALIDA'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"novo_status\": \"EM_PREPARO\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/pedidos/{{pedido_id}}/status",
+          "host": ["{{base_url}}"],
+          "path": ["pedidos", "{{pedido_id}}", "status"]
         }
       },
       "response": []
     }
   ],
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://127.0.0.1:8000"
-    },
-    {
-      "key": "token_admin",
-      "value": ""
-    },
-    {
-      "key": "token_cliente",
-      "value": ""
-    },
-    {
-      "key": "pedido_id",
-      "value": ""
-    },
-    {
-      "key": "pedido_recusado_id",
-      "value": ""
-    },
-    {
-      "key": "unidade_teste_id",
-      "value": ""
-    }
+    { "key": "base_url",          "value": "http://127.0.0.1:8000" },
+    { "key": "token_admin",       "value": "" },
+    { "key": "token_cliente",     "value": "" },
+    { "key": "pedido_id",         "value": "" },
+    { "key": "pedido_recusado_id","value": "" },
+    { "key": "unidade_teste_id",  "value": "" }
   ]
 }

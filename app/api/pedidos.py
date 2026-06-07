@@ -62,6 +62,15 @@ class PedidoResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class AtualizarStatusRequest(BaseModel):
+    novo_status: str
+
+# --- Transições de status válidas (fluxo de cozinha) ---
+TRANSICOES_VALIDAS = {
+    "EM_PREPARO": ["PRONTO", "CANCELADO"],
+    "PRONTO":     ["ENTREGUE"],
+}
+
 # --- Endpoints ---
 
 @router.post("/", response_model=PedidoResponse, status_code=201)
@@ -236,3 +245,57 @@ def buscar_pedido(
             "path": f"/pedidos/{pedido_id}"
         })
     return pedido
+
+
+@router.patch("/{pedido_id}/status", summary="Atualizar status do pedido (cozinha)")
+def atualizar_status_pedido(
+    pedido_id: int,
+    body: AtualizarStatusRequest,
+    db: Session = Depends(get_db),
+    usuario_atual=Depends(require_perfil("ADMIN", "GERENTE")),
+):
+    pedido = db.query(Pedido).filter(Pedido.id == pedido_id).first()
+
+    if not pedido:
+        raise HTTPException(status_code=404, detail={
+            "error": "PEDIDO_NAO_ENCONTRADO",
+            "message": f"Pedido {pedido_id} não encontrado.",
+            "details": [],
+            "timestamp": datetime.utcnow().isoformat(),
+            "path": f"/pedidos/{pedido_id}/status"
+        })
+
+    status_atual = pedido.status
+    novo_status = body.novo_status.upper()
+
+    permitidos = TRANSICOES_VALIDAS.get(status_atual, [])
+    if novo_status not in permitidos:
+        raise HTTPException(status_code=422, detail={
+            "error": "TRANSICAO_INVALIDA",
+            "message": (
+                f"Transição '{status_atual}' → '{novo_status}' não é permitida. "
+                f"Transições válidas a partir de '{status_atual}': {permitidos}"
+            ),
+            "details": [],
+            "timestamp": datetime.utcnow().isoformat(),
+            "path": f"/pedidos/{pedido_id}/status"
+        })
+
+    pedido.status = novo_status
+    db.commit()
+    db.refresh(pedido)
+
+    registrar_auditoria(
+        db,
+        acao="ATUALIZAR_STATUS_PEDIDO",
+        entidade="pedido",
+        usuario_id=usuario_atual.id,
+        entidade_id=pedido.id,
+        detalhes={"status_anterior": status_atual, "status_novo": novo_status}
+    )
+
+    return {
+        "pedido_id": pedido.id,
+        "status_anterior": status_atual,
+        "status_atual": pedido.status,
+    }
